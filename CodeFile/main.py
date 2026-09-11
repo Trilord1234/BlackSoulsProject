@@ -23,6 +23,7 @@ TODO CONNUS (repris des notes de l'auteur dans la version originale) :
 """
 
 import time
+import questionary
 
 import game_state as gs
 import ui
@@ -67,7 +68,10 @@ def show_tutorial():
 def enter_the_lost_empire():
     ui.clear_screen()
     print("_________Welcome to the Lost Empire_________")
-    choice = input("Enter the lost Empire ? (Yes/No) : ")
+    choice = questionary.select(
+        "Enter the lost Empire ?",
+        choices=["Yes", "No"]
+    ).ask()
     if choice != "Yes":
         print("Do you really think you have a choice here ?")
         print("Anyway...")

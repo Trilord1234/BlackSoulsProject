@@ -9,6 +9,7 @@ du monstre, elles se contentent de LIRE game_state pour les afficher.
 """
 
 import os
+import msvcrt
 import game_state as gs
 
 
@@ -19,6 +20,8 @@ def clear_screen():
 
 def wait():
     """Met le jeu en pause jusqu'à ce que le joueur appuie sur Entrée."""
+    while msvcrt.kbhit():
+        msvcrt.getch()
     input("✿...")
 
 

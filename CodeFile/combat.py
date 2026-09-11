@@ -15,6 +15,8 @@ agissent plus souvent).
 
 import time
 from random import randint
+import questionary
+import msvcrt
 
 import game_state as gs
 import ui
@@ -68,9 +70,13 @@ def ActionSysteme():
     """
     Action = False
     while not Action:
-        print("________Your turn________")
-        print("-Attack           -Spells\n-Dodge            -Guard\n-Check            -Flee\n")
-        choice = input("Choose your action : ")
+        while msvcrt.kbhit():
+                msvcrt.getch()
+        choice = questionary.select(
+            "________Your turn________",
+            choices=["Attack", "Spells", "Dodge", "Guard", "Check", "Flee"]
+        ).ask()
+
         gs.Dodge = False
         gs.Guard = False
 
