@@ -59,6 +59,7 @@ def talk_to_elisabeth():
             min_allowed=1,
             max_allowed=9999,
             default=1,
+            filter=int
         ).execute()
 
         total_cost = abs(LV_UP_SOULS[soul_name][gs.SOULS]) * NumberOfSouls
