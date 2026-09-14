@@ -68,7 +68,12 @@ def MonsterToFight(Floor):
     (.copy()) des stats de base : on peut donc les modifier librement pendant
     le combat sans abîmer les données d'origine dans data_bestiary.MOBS.
     """
-    x = randint(0, len(Dungeon[Floor]) - 2)
+    if Floor == 8 :
+        x = randint(0, len(Dungeon[Floor]) - 4)
+    elif Floor == 10:
+        x = randint(0, len(Dungeon[Floor]) - 3)
+    else:   
+        x = randint(0, len(Dungeon[Floor]) - 2)
     Monster_Name = Dungeon[Floor][x]
     Monster_Stats = MOBS[Monster_Name].copy()
     return Monster_Name, Monster_Stats

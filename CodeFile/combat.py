@@ -21,7 +21,7 @@ import msvcrt
 import game_state as gs
 import ui
 from loot import Loot
-from data_spells import SPELLS
+from data_spells import SPELLS, Debuff_Application
 
 
 def MonsterAttack():
@@ -99,36 +99,64 @@ def ActionSysteme():
             Action = True
             ui.wait()
 
-        elif choice == "Spells":  # Les effets (Poison/Burn/Freeze) n'ont pas encore été ajoutés
+        elif choice == "Spells": 
             if len(gs.Spells) == 0:
                 print("you don't have any spells")
             else:
+                answer = []
                 for i in range(len(gs.Spells)):
-                    print(f"{i + 1}-", gs.Spells[i], "--- Mana Cost :", SPELLS[gs.Spells[i]]["mana_cost"])
-                spellschoice = ui.ask_int("Wich one do I use ? : ", "Please enter the Number, not the Action")
-
-                if spellschoice > len(gs.Spells) or spellschoice < 1:
-                    print("I don't have this Spells...")
-                    ui.wait()
-                elif gs.Stats[gs.MP] < SPELLS[gs.Spells[spellschoice - 1]]["mana_cost"]:
+                    answer.append(
+                        questionary.Choice(
+                            title=f"{i + 1}- {gs.Spells[i]} --- Mana Cost : {SPELLS[gs.Spells[i]]['mana_cost']}",
+                            value= gs.Spells[i]
+                        )
+                    )
+                answer.append(questionary.Choice(title="Nevermind", value="❌"))
+                spellschoice = questionary.select(
+                    "Wich one do I use ? : ",
+                    choices=answer
+                ).ask()
+                if spellschoice == "❌" :
+                    continue
+                elif gs.Stats[gs.MP] < SPELLS[spellschoice]["mana_cost"]:
                     print("I don't have enought MP...")
                     ui.wait()
                 else:
-                    spell_name = gs.Spells[spellschoice - 1]
+                    spell_name = spellschoice
                     spell = SPELLS[spell_name]
 
                     if spell["type"] == "Attack":
                         print("Spells Use !")
                         if not CriticalHit:
-                            gs.Monster_Stats[gs.HP] -= spell["power"]
+                            gs.Monster_Stats[gs.HP] -= spell["power"]()
                             gs.Stats[gs.MP] -= spell["mana_cost"]
-                            print("You did :", spell["power"], "Damage !")
+                            if spell["effect"] == "Burn":
+                                gs.MonsterDebuff["Burn"] = 3
+                                print("You did :", spell["power"](), "Damage! And inflict Burn!")
+                            elif spell["effect"] == "Poison":
+                                gs.MonsterDebuff["Poison"] = 3
+                                print("You did :", spell["power"](), "Damage! And inflict Poison!")
+                            elif spell["effect"] == "Freeze":
+                                gs.MonsterDebuff["Freeze"] = 3
+                                print("You did :", spell["power"](), "Damage! And inflict Freeze!")
+                            else:
+                                print("You did :", spell["power"](), "Damage!")
                         else:
-                            total = round(spell["power"] + spell["power"] * (gs.CritDamage / 100))
+                            total = round(spell["power"]() + spell["power"]() * (gs.CritDamage / 100))
                             gs.Monster_Stats[gs.HP] -= total
                             gs.Stats[gs.MP] -= spell["mana_cost"]
                             print("CriticalHit !!!")
-                            print("You did :", total, "Damage !")
+                            if spell["effect"] == "Burn":
+                                gs.MonsterDebuff["Burn"] = 3
+                                print("You did :", total, "Damage! And inflict Burn!")
+                            elif spell["effect"] == "Poison":
+                                gs.MonsterDebuff["Poison"] = 3
+                                print("You did :", total, "Damage! And inflict Poison!")
+                            elif spell["effect"] == "Freeze":
+                                gs.MonsterDebuff["Freeze"] = 3
+                                print("You did :", total, "Damage! And inflict Freeze!")
+                            else:
+                                print("You did :", total, "Damage!")
                         Action = True
                         ui.wait()
 
@@ -136,11 +164,11 @@ def ActionSysteme():
                         print("Spells Use !")
                         BeforeHeal = gs.Stats[gs.HP]
                         if not CriticalHit:
-                            gs.Stats[gs.HP] += spell["power"]
+                            gs.Stats[gs.HP] += spell["power"]()
                             gs.Stats[gs.MP] -= spell["mana_cost"]
                         else:
                             print("CriticalHeal !!!")
-                            gs.Stats[gs.HP] += spell["power"] + spell["power"] * (gs.CritDamage / 100)
+                            gs.Stats[gs.HP] += spell["power"]() + spell["power"]() * (gs.CritDamage / 100)
                             gs.Stats[gs.MP] -= spell["mana_cost"]
                         if gs.Stats[gs.HP] > gs.Max_Stats[gs.HP]:
                             gs.Stats[gs.HP] = gs.Max_Stats[gs.HP]
@@ -166,6 +194,7 @@ def ActionSysteme():
                 print(f"{gs.Name} starts running away !")
                 gs.Flee = True
                 Action = True
+                gs.Escape = True
                 ui.wait()
             else:
                 print(f"{gs.Name} starts running away ! \nBut the escape path was blocked!")
@@ -198,11 +227,15 @@ def FightSysteme(speed_grimm, speed_monster, size=30):
     filling_speed_monster = max_speed / speed_monster
     grimm_systeme = 0
     monster_systeme = 0
+    gs.MonsterDebuff = {}
 
     while gs.Stats[gs.HP] > 0 and gs.Monster_Stats[gs.HP] > 0:
 
         grimm_systeme += 0.05 * (100 / filling_speed_grimm)
-        monster_systeme += 0.05 * (100 / filling_speed_monster)
+        if "Freeze" in gs.MonsterDebuff:
+            monster_systeme += (0.05 * (100 / filling_speed_monster))*(1-0.25)
+        else :    
+            monster_systeme += 0.05 * (100 / filling_speed_monster)
 
         ui.clear_screen()
 
@@ -229,14 +262,24 @@ def FightSysteme(speed_grimm, speed_monster, size=30):
                 time.sleep(0.5)
 
                 if monster_systeme >= 100:
-                    print("Monster turn")
-                    MonsterAttack()
+                    Debuff_Application(gs.Monster_Stats, gs.Monster_Name)
+                    if gs.Monster_Stats[gs.HP] <= 0:
+                        print(f"{gs.Monster_Name} succumbed to its wounds !")
+                    else:
+                        print("Monster turn")
+                        MonsterAttack()
                     monster_systeme -= 100
-                    ui.wait()
+                    time.sleep(0.5)
             else:
-                print("Monster turn")
-                MonsterAttack()
-                monster_systeme -= 100
+                if monster_systeme >= 100:
+                    Debuff_Application(gs.Monster_Stats, gs.Monster_Name)
+                    if gs.Monster_Stats[gs.HP] <= 0:
+                        print(f"{gs.Monster_Name} succumbed to its wounds !")
+                    else:
+                        print("Monster turn")
+                        MonsterAttack()
+                    monster_systeme -= 100
+                
                 time.sleep(0.5)
                 if grimm_systeme >= 100:
                     print("Grimm turn")
@@ -257,8 +300,12 @@ def FightSysteme(speed_grimm, speed_monster, size=30):
                 grimm_systeme -= 100
                 time.sleep(0.5)
             if monster_systeme >= 100:
-                print("Monster turn")
-                MonsterAttack()
+                Debuff_Application(gs.Monster_Stats, gs.Monster_Name)
+                if gs.Monster_Stats[gs.HP] <= 0:
+                    print(f"{gs.Monster_Name} succumbed to its wounds !")
+                else:
+                    print("Monster turn")
+                    MonsterAttack()
                 monster_systeme -= 100
                 time.sleep(0.5)
 

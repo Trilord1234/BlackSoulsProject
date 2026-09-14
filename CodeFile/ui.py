@@ -25,6 +25,26 @@ def wait():
     input("✿...")
 
 
+EFFECT_ICONS = {
+    "Poison": "🧪",
+    "Burn": "🔥",
+    "Freeze": "❄️",
+}
+
+def Debuffs_Display():
+    """
+    Construit une string du style "🧪x2 🔥x1 ❄️x3" à partir de gs.MonsterDebuff.
+    Renvoie une string vide si aucun effet n'est actif.
+    """
+    if len(gs.MonsterDebuff) == 0:
+        return ""
+
+    debuffdisplay = []
+    for debuff, debufftime in gs.MonsterDebuff.items():
+        icone = EFFECT_ICONS.get(debuff, debuff)  # si un effet sans icône existe un jour, affiche son nom brut
+        debuffdisplay.append(f"{icone}x{debufftime}")
+    return " " + " ".join(debuffdisplay)
+
 def SpeedSysteme(fill, size=30):
     """
     Construit une barre de progression texte, ex: [██████    ].
@@ -34,7 +54,6 @@ def SpeedSysteme(fill, size=30):
     """
     progress = int(fill / 100 * size)
     return "[" + "█" * progress + " " * (size - progress) + "]"
-
 
 def HPMPSystemeGrimm():
     """Affiche la ligne HP/MP du joueur (nom, barre de vie, barre de mana)."""
@@ -65,7 +84,6 @@ def ask_int(prompt, error_message="Please enter a number, not text."):
         except ValueError:
             print(error_message)
 
-
 def HPMPSystemeMonster(HP_max, MP_max):
     """
     Affiche la ligne HP/MP du monstre actuellement combattu (gs.Monster_Stats).
@@ -82,4 +100,4 @@ def HPMPSystemeMonster(HP_max, MP_max):
     MP_filled = int(10 * MP_ratio)
     MP_bar = '▓' * MP_filled + '-' * (10 - MP_filled)
 
-    print(f"{gs.Monster_Name:10} |HP|{HP_bar}| {gs.Monster_Stats[gs.HP]}/{HP_max} |MP|{MP_bar}| {gs.Monster_Stats[gs.MP]}/{MP_max}")
+    print(f"{gs.Monster_Name:10} |HP|{HP_bar}| {gs.Monster_Stats[gs.HP]}/{HP_max} |MP|{MP_bar}| {gs.Monster_Stats[gs.MP]}/{MP_max}{Debuffs_Display()}")

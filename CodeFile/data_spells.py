@@ -25,60 +25,60 @@ ATTENTION - piège classique à connaître pour la suite du projet :
 """
 
 import game_state as gs
-from constants import MAG, ATK, HP
+from constants import HP, MP, ATK, MAG, DEF, SPD, LCK, SOULS
 
 SPELLS = {
     "Soul Arrow": {
         "type": "Attack",
-        "power": 10 + round((25 / 100) * gs.Stats[MAG]),
+        "power": lambda : 10 + round((25 / 100) * gs.Stats[MAG]),
         "mana_cost": 10,
         "effect": None,
     },
     "Soul Light": {
         "type": "Heal",
-        "power": (gs.Stats[MAG] // 4) + round((10 / 100) * gs.Stats[HP]),
+        "power": lambda : (gs.Stats[MAG] // 4) + round((10 / 100) * gs.Stats[HP]),
         "mana_cost": 12,
         "effect": None,
     },
     "Soul Radiance": {
         "type": "Attack",
-        "power": 20 + round((25 / 100) * gs.Stats[MAG]),
+        "power": lambda : 20 + round((25 / 100) * gs.Stats[MAG]),
         "mana_cost": 15,
         "effect": None,
     },
     "Omniblow": {
         "type": "Attack",
-        "power": 15 + round((25 / 100) * gs.Stats[ATK]),
+        "power": lambda : 15 + round((25 / 100) * gs.Stats[ATK]),
         "mana_cost": 12,
         "effect": None,
     },
     "Poison": {
         "type": "Attack",
-        "power": 10 + round((25 / 100) * gs.Stats[MAG]),
+        "power": lambda : 10 + round((25 / 100) * gs.Stats[MAG]),
         "mana_cost": 20,
         "effect": "Poison",
     },
     "Flame": {
         "type": "Attack",
-        "power": 10 + round((25 / 100) * gs.Stats[MAG]),
+        "power": lambda : 10 + round((25 / 100) * gs.Stats[MAG]),
         "mana_cost": 20,
         "effect": "Burn",
     },
     "Frozen Magic Bullet": {
         "type": "Attack",
-        "power": 10 + round((25 / 100) * gs.Stats[MAG]),
+        "power": lambda : 10 + round((25 / 100) * gs.Stats[MAG]),
         "mana_cost": 20,
         "effect": "Freeze",
     },
     "Heavy Soul Discharge": {
         "type": "Attack",
-        "power": 50 + round((25 / 100) * gs.Stats[MAG]),
+        "power": lambda : 50 + round((25 / 100) * gs.Stats[MAG]),
         "mana_cost": 40,
         "effect": None,
     },
     "Restore": {
         "type": "Heal",
-        "power": (gs.Stats[MAG] // 4) + round((30 / 100) * gs.Stats[HP]),
+        "power": lambda : (gs.Stats[MAG] // 4) + round((30 / 100) * gs.Stats[HP]),
         "mana_cost": 25,
         "effect": None,
     },
@@ -109,3 +109,24 @@ SpellsExplain = {
     "Heavy Soul Discharge": "Shoot a heavy soul arrow at the target enemy.\n               The power scales with the caster's Magic. Dealing 50+ damage\n",
     "Restore": "Call back the warmth of life from the silence of the grave.\n               The power scales with the caster's Magic. Healing 30% or more\n",
 }
+
+
+#___________Application des effets___________
+
+def Debuff_Application(MonsterStat, MonsterName):
+    if "Burn" in gs.MonsterDebuff :
+        BurnDamage = round(gs.HP_max_Monster*(0.06))
+        MonsterStat[HP] -= BurnDamage
+        print(f"{MonsterName} as taken {BurnDamage} from Burn")
+    if "Poison" in gs.MonsterDebuff :
+        PoisonDamage = round(gs.HP_max_Monster*(0.1))
+        if MonsterStat[HP] <= PoisonDamage:
+            MonsterStat[HP] = 1
+            print(f"{MonsterName} is on the verge of dying because of Poison")
+        else :
+            MonsterStat[HP] -= PoisonDamage
+            print(f"{MonsterName} as taken {PoisonDamage} from Poison")
+    for effet in list(gs.MonsterDebuff):   
+        gs.MonsterDebuff[effet] -= 1
+        if gs.MonsterDebuff[effet] <= 0:
+            del gs.MonsterDebuff[effet]

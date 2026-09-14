@@ -52,7 +52,7 @@ Stats = [350, 50, 35, 10, 15, 40, 10, 0]      # Valeurs actuelles + Souls (index
 Gear = [0, 0, 0]          # [Arme, Anneau slot 1, Anneau slot 2] ; 0 = emplacement vide
 WeaponsInventory = []     # Armes possédées mais pas équipées
 RingsInventory = []       # Anneaux possédés mais pas équipés
-Spells = []               # Sorts appris
+Spells = ["Flame", "Frozen Magic Bullet"]               # Sorts appris
 
 # ------------------------- Stats de coup critique -------------------------
 CritChance = 5 + (Stats[LCK] // 2)   # % de chance de faire un coup critique
@@ -75,11 +75,13 @@ HP_max_Monster = 0
 MP_max_Monster = 0
 CritChanceMonster = 0
 CritDamageMonster = 100
+MonsterDebuff = {}
 
 # Action défensive choisie par le joueur pour le prochain coup de l'ennemi
 Dodge = False
 Guard = False
 Flee = False   # True si le joueur vient de fuir le combat
+Escape = False #True si le joueur a réussi a fuir
 
 
 def reset_after_death():

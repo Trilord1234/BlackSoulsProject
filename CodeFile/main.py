@@ -88,10 +88,18 @@ def prepare_next_fight():
     Remplit gs.Monster_Name / gs.Monster_Stats / gs.HP_max_Monster / etc.
     """
     if gs.MonsterKill >= gs.NbMonsterToKill:
-        FightBoss = input("Do you want to enter the boss Room ? (Yes/No) : ")
+        FightBoss = questionary.select(
+            "Do you want to enter the boss Room ? (Yes/No) : ",
+            choices=["Yes", "No"]
+        ).ask()
         if FightBoss == "Yes":
             gs.BossFight = True
-            boss_name = dungeon.Dungeon[gs.Floor][-1]  # le boss est toujours en dernière position, voir dungeon.py
+            if gs.Floor == 8:
+                boss_name = dungeon.Dungeon[gs.Floor][-3]
+            elif gs.Floor == 10:
+                boss_name = dungeon.Dungeon[gs.Floor][-2]
+            else:
+                boss_name = dungeon.Dungeon[gs.Floor][-1]  # le boss est toujours en dernière position, voir dungeon.py
             gs.Monster_Name = boss_name
             gs.Monster_Stats = BOSS[boss_name].copy()
 
@@ -141,10 +149,54 @@ def run_dungeon_loop():
 
         if gs.Dead:
             gs.reset_after_death()
-        elif gs.BossFight:
-            gs.BossFight = False
-            gs.Floor += 1
+        
+        if gs.BossFight and not gs.Escape :
+            if gs.Floor == 8:
+                gs.Monster_Name = "Rotting Drake Helkaiser"
+                gs.Monster_Stats = BOSS[gs.Monster_Name].copy()
+                gs.HP_max_Monster = gs.Monster_Stats[gs.HP]
+                gs.MP_max_Monster = gs.Monster_Stats[gs.MP]
+                gs.CritChanceMonster = 5 + (gs.Monster_Stats[gs.LCK] // 2)
+                gs.CritDamageMonster = 100
+                combat.FightSysteme(gs.Stats[gs.SPD], gs.Monster_Stats[gs.SPD])
+                ui.clear_screen()
 
+                if gs.Dead:
+                    gs.reset_after_death()
+                elif not gs.Escape :
+                    gs.Monster_Name = "Undead Drake Helkaiser"
+                    gs.Monster_Stats = BOSS[gs.Monster_Name].copy()
+                    gs.HP_max_Monster = gs.Monster_Stats[gs.HP]
+                    gs.MP_max_Monster = gs.Monster_Stats[gs.MP]
+                    gs.CritChanceMonster = 5 + (gs.Monster_Stats[gs.LCK] // 2)
+                    gs.CritDamageMonster = 100
+                    combat.FightSysteme(gs.Stats[gs.SPD], gs.Monster_Stats[gs.SPD])
+                    ui.clear_screen()
+                    if gs.Dead:
+                        gs.reset_after_death()
+
+            elif gs.Floor == 10 and not gs.Escape :
+                gs.Monster_Name = "Demon Queen Cinderella"
+                gs.Monster_Stats = BOSS[gs.Monster_Name].copy()
+                gs.HP_max_Monster = gs.Monster_Stats[gs.HP]
+                gs.MP_max_Monster = gs.Monster_Stats[gs.MP]
+                gs.CritChanceMonster = 5 + (gs.Monster_Stats[gs.LCK] // 2)
+                gs.CritDamageMonster = 100
+                combat.FightSysteme(gs.Stats[gs.SPD], gs.Monster_Stats[gs.SPD])
+                ui.clear_screen()
+
+                if gs.Dead:
+                    gs.reset_after_death()
+
+        if gs.BossFight and not gs.Escape:
+            if gs.Floor == 10:
+                gs.END = True
+                #Fonction d'affiche ou de fin activer
+            else :
+                gs.BossFight = False
+                gs.Floor += 1
+
+        gs.Escape = False
         bonfire.BoneFire()
         ui.clear_screen()
 

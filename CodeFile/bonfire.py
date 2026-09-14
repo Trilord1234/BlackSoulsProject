@@ -17,6 +17,7 @@ PNJ et ce qu'ils font :
 
 from random import randint
 import questionary
+from InquirerPy import inquirer
 
 import game_state as gs
 import ui
@@ -49,11 +50,17 @@ def talk_to_elisabeth():
             choices=answer
         ).ask()
 
-        if soul_name is "❌":
+        if soul_name == "❌":
             print("Fufufu~ Then come back to me once you've cleared your mind.")
             return
 
-        NumberOfSouls = ui.ask_int("How many souls will you claim? : ", "Oh dear... Words have no value here. Only numbers carry weight.")
+        NumberOfSouls = inquirer.number(
+            message="How many souls will you claim? : ",
+            min_allowed=1,
+            max_allowed=9999,
+            default=1,
+        ).execute()
+
         total_cost = abs(LV_UP_SOULS[soul_name][gs.SOULS]) * NumberOfSouls
 
         if gs.Stats[gs.SOULS] >= total_cost:
@@ -269,7 +276,7 @@ def talk_to_dorothy():
                 choices= answer
             ).ask()
 
-            if buychoice is "❌":
+            if buychoice == "❌":
                 print("Wandering without purpose again? You’ll end up hexed by your own confusion.")
                 return
             spellindex = SpellsListName.index(buychoice)
