@@ -253,7 +253,7 @@ def FightSysteme(speed_grimm, speed_monster, size=30):
         if grimm_systeme >= 100 and monster_systeme >= 100:
 
             if speed_grimm >= speed_monster:
-                print("Grimm turn")
+                print("[Grimm turn]")
                 ActionSysteme()
                 if gs.Flee:
                     gs.Flee = False
@@ -264,9 +264,9 @@ def FightSysteme(speed_grimm, speed_monster, size=30):
                 if monster_systeme >= 100:
                     Debuff_Application(gs.Monster_Stats, gs.Monster_Name)
                     if gs.Monster_Stats[gs.HP] <= 0:
-                        print(f"{gs.Monster_Name} succumbed to its wounds !")
+                        pass
                     else:
-                        print("Monster turn")
+                        print("[Monster turn]")
                         MonsterAttack()
                     monster_systeme -= 100
                     time.sleep(0.5)
@@ -274,15 +274,15 @@ def FightSysteme(speed_grimm, speed_monster, size=30):
                 if monster_systeme >= 100:
                     Debuff_Application(gs.Monster_Stats, gs.Monster_Name)
                     if gs.Monster_Stats[gs.HP] <= 0:
-                        print(f"{gs.Monster_Name} succumbed to its wounds !")
+                        pass
                     else:
-                        print("Monster turn")
+                        print("[Monster turn]")
                         MonsterAttack()
                     monster_systeme -= 100
                 
                 time.sleep(0.5)
                 if grimm_systeme >= 100:
-                    print("Grimm turn")
+                    print("[Grimm turn]")
                     ActionSysteme()
                     if gs.Flee:
                         gs.Flee = False
@@ -292,7 +292,7 @@ def FightSysteme(speed_grimm, speed_monster, size=30):
 
         else:
             if grimm_systeme >= 100:
-                print("Grimm turn")
+                print("[Grimm turn]")
                 ActionSysteme()
                 if gs.Flee:
                     gs.Flee = False
@@ -302,9 +302,9 @@ def FightSysteme(speed_grimm, speed_monster, size=30):
             if monster_systeme >= 100:
                 Debuff_Application(gs.Monster_Stats, gs.Monster_Name)
                 if gs.Monster_Stats[gs.HP] <= 0:
-                    print(f"{gs.Monster_Name} succumbed to its wounds !")
+                    pass
                 else:
-                    print("Monster turn")
+                    print("[Monster turn]")
                     MonsterAttack()
                 monster_systeme -= 100
                 time.sleep(0.5)

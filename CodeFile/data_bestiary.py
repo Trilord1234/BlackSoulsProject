@@ -57,8 +57,6 @@ MOBS = {
 # Boss classés dans l'ordre où ils apparaissent (étage 0 à 10).
 # Certains boss ont plusieurs "phases" (ex : Drake Helkaiser -> Rotting -> Undead)
 # qui sont juste des entrées séparées dans ce dict, combattues à la suite
-# (le TODO "gérer les boss à plusieurs phases" concerne l'enchaînement de ces
-# phases, pas encore automatisé dans dungeon.py / combat.py).
 BOSS = {
     "Hyena of Hunger": [5300, 40, 85, 10, 25, 65, 10, 7500],
     "Naked King": [10000, 2000, 110, 110, 10, 40, 10, 15000],

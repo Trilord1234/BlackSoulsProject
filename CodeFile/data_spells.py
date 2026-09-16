@@ -7,21 +7,9 @@ Souls dans la boutique de Dorothy, et leur texte d'explication.
 
 Chaque sort est un dict avec :
     "type"      : "Attack" ou "Heal"
-    "power"     : dégâts infligés ou HP soignés (dépend des stats du joueur
-                  AU MOMENT DU CHARGEMENT du fichier, voir la remarque
-                  "ATTENTION" ci-dessous)
+    "power"     : dégâts infligés ou HP soignés (dépend des stats du joueur)
     "mana_cost" : coût en MP pour lancer le sort
     "effect"    : None, ou un effet de statut ("Poison", "Burn", "Freeze")
-                  -> ces effets de statut ne sont pas encore appliqués en jeu,
-                  c'est une des choses qu'il reste à coder (TODO Loot/Effets).
-
-ATTENTION - piège classique à connaître pour la suite du projet :
-    "power" est calculé UNE SEULE FOIS, au moment où Python lit ce fichier
-    (donc avec les stats de départ du joueur). Si tu veux qu'un sort devienne
-    plus puissant quand le joueur monte en Magie/Force, il faudra recalculer
-    "power" à chaque lancer de sort (dans combat.py) plutôt que de lire cette
-    valeur figée. C'est justement un des 2 gros trucs que tu avais notés à
-    faire ("mettre à jour les stats des sorts/objets qui scalent").
 """
 
 import game_state as gs

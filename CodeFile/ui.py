@@ -11,7 +11,9 @@ du monstre, elles se contentent de LIRE game_state pour les afficher.
 import os
 import msvcrt
 import game_state as gs
-
+from colorama import init, Fore, Style
+from questionary import Style as QStyle
+init()
 
 def clear_screen():
     """Vide le terminal (fonctionne sous Windows comme sous Mac/Linux)."""
@@ -24,6 +26,25 @@ def wait():
         msvcrt.getch()
     input("✿...")
 
+
+NPC_COLORS = {
+    "Elisabeth": Fore.LIGHTRED_EX,
+    "Victoria": Fore.LIGHTMAGENTA_EX,
+    "Leaf": Fore.LIGHTGREEN_EX,
+    "Catherine": Fore.LIGHTYELLOW_EX,
+    "Dorothy": "\033[38;2;181;98;44m", #Marron clair
+}
+NPC_STYLES = {
+    "Elisabeth": QStyle([("question", "fg:#ff8080 bold")]),
+    "Victoria": QStyle([("question", "fg:#ff80ff bold")]),
+    "Leaf": QStyle([("question", "fg:#80ff80 bold")]),
+    "Catherine": QStyle([("question", "fg:#ffff80 bold")]),
+    "Dorothy": QStyle([("question", "fg:#B5622C bold")]),
+}
+
+def NPC_Talk(texte, character):
+    couleur = NPC_COLORS[character]
+    print(couleur + texte + Style.RESET_ALL)
 
 EFFECT_ICONS = {
     "Poison": "🧪",

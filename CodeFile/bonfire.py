@@ -17,7 +17,7 @@ PNJ et ce qu'ils font :
 
 from random import randint
 import questionary
-from InquirerPy import inquirer
+from InquirerPy import inquirer, get_style
 
 import game_state as gs
 import ui
@@ -29,10 +29,11 @@ from dialogue import LeafRandomFact
 
 def talk_to_elisabeth():
     """Boutique des Souls de montée de niveau (augmentent Max_Stats)."""
-    print("Soul Lady Elisabeth :")
+    ui.NPC_Talk("Soul Lady Elisabeth :", "Elisabeth")
     choice = questionary.select(
         "Ah... Sir undead. Do you have business with me ?",
-        choices=["I want to buy souls", "What do they do ?", "Nevermind"]
+        choices=["I want to buy souls", "What do they do ?", "Nevermind"],
+        style= ui.NPC_STYLES["Elisabeth"],
     ).ask()
 
     if choice == "I want to buy souls":
@@ -47,11 +48,12 @@ def talk_to_elisabeth():
         answer.append(questionary.Choice(title="Nevermind", value="❌"))
         soul_name = questionary.select(
             f"Fufufu. Here, please look at them.To you, I'll show them any number of time.\nWich one caught your eyes ? Souls : {gs.Stats[gs.SOULS]}",
-            choices=answer
+            choices=answer,
+            style = ui.NPC_STYLES["Elisabeth"],
         ).ask()
 
         if soul_name == "❌":
-            print("Fufufu~ Then come back to me once you've cleared your mind.")
+            ui.NPC_Talk("Fufufu~ Then come back to me once you've cleared your mind.", "Elisabeth")
             return
 
         NumberOfSouls = inquirer.number(
@@ -59,7 +61,8 @@ def talk_to_elisabeth():
             min_allowed=1,
             max_allowed=9999,
             default=1,
-            filter=int
+            filter=int,
+            style= get_style({"question": "#ff8080 bold"}),
         ).execute()
 
         total_cost = abs(LV_UP_SOULS[soul_name][gs.SOULS]) * NumberOfSouls
@@ -69,30 +72,31 @@ def talk_to_elisabeth():
                 for i in range(len(gs.Max_Stats)):
                     gs.Max_Stats[i] += LV_UP_SOULS[soul_name][i]
                 gs.Stats[gs.SOULS] += LV_UP_SOULS[soul_name][gs.SOULS]
-            print("May the power of Souls dwell withing you")
+            ui.NPC_Talk("May the power of Souls dwell withing you", "Elisabeth")
         else:
-            print("Look like you don't have enough, dear~")
+            ui.NPC_Talk("Look like you don't have enough, dear~", "Elisabeth")
 
     elif choice == "What do they do ?":
-        print("Here some explication my dear~ : ")
+        ui.NPC_Talk("Here some explication my dear~ : ", "Elisabeth")
         for explanation in SoulsExplanation:
             print(f"    {explanation}")
 
     elif choice == "Nevermind":
-        print("Fufufu~ Then come back to me once you've cleared your mind.")
+        ui.NPC_Talk("Fufufu~ Then come back to me once you've cleared your mind.", "Elisabeth")
 
     else:
-        print("Where do you even get that idea ?")
+        ui.NPC_Talk("Where do you even get that idea ?", "Elisabeth")
 
 
 def talk_to_victoria():
     """Gestion de l'équipement : changer d'arme, changer d'anneau, voir l'équipement actuel."""
-    print("Maid Victoria :")
-    print("Welcome back, Master")
+    ui.NPC_Talk("Maid Victoria :", "Victoria")
+    ui.NPC_Talk("Welcome back, Master", "Victoria")
     error = "Forgive me, Master, but… I believe you should enter a number… if that’s alright."
     choice = questionary.select(
         "Can I do something for you ?",
-        choices=["Help me change my Weapon", "Help me change my Rings", "Whats my Equipement ?" ,"Wich effects do they have?", "No everything fine"]
+        choices=["Help me change my Weapon", "Help me change my Rings", "Whats my Equipement ?" ,"Wich effects do they have?", "No everything fine"],
+        style= ui.NPC_STYLES["Victoria"],
     ).ask()
 
     if choice == "Help me change my Weapon":
@@ -100,7 +104,7 @@ def talk_to_victoria():
     elif choice == "Help me change my Rings":
         _change_ring(error)
     elif choice == "Whats my Equipement ?":
-        print("Here it is Master ! :\n")
+        ui.NPC_Talk("Here it is Master ! :\n", "Victoria")
         print("--- Your Equipment ---")
         print(f"- Weapon : {gs.Gear[0] if gs.Gear[0] != 0 else 'None'}")
         print(f"- Ring 1 : {gs.Gear[1] if gs.Gear[1] != 0 else 'None'}")
@@ -117,7 +121,7 @@ def talk_to_victoria():
             if gs.Gear[i] != 0:
                 allequipment.append(gs.Gear[i])
                 nbequipped += 1
-        print("Here's the explanation about the equipment you have on you Master. :")
+        ui.NPC_Talk("Here's the explanation about the equipment you have on you Master. :", "Victoria")
         for i in range(len(allequipment)):
             if i >= len(allequipment) - nbequipped:
                 print("[EQUIPPED]",allequipment[i]," : ",EquipementExplain[allequipment[i]])
@@ -125,19 +129,20 @@ def talk_to_victoria():
                 print(allequipment[i]," : ",EquipementExplain[allequipment[i]])
         
     elif choice == "No everything fine":
-        print("Then be safe on your journey Master\n")
+        ui.NPC_Talk("Then be safe on your journey Master\n", "Victoria")
     else:
-        print("Master do you really feel allright ? Maybe will it be better if you rest ?")
+        ui.NPC_Talk("Master do you really feel allright ? Maybe will it be better if you rest ?", "Victoria")
 
 
 def _change_weapon(error_message):
     if len(gs.WeaponsInventory) == 0:
-        print("Sorry Master, but you have no weapons to equip yourself with...")
+        ui.NPC_Talk("Sorry Master, but you have no weapons to equip yourself with...", "Victoria")
         return
-    print("Of course Master let me Help you\n")
+    ui.NPC_Talk("Of course Master let me Help you\n", "Victoria")
     new_weapon = questionary.select(
         "I want... :",
-        choices=gs.WeaponsInventory
+        choices=gs.WeaponsInventory,
+        style= ui.NPC_STYLES["Victoria"],
     ).ask()
     gs.WeaponsInventory.remove(new_weapon)
     if gs.Gear[0] != 0:
@@ -154,19 +159,20 @@ def _change_weapon(error_message):
 
 def _change_ring(error_message):
     if len(gs.RingsInventory) == 0:
-        print("Sorry Master, but you have no rings to equip yourself with...")
+        ui.NPC_Talk("Sorry Master, but you have no rings to equip yourself with...", "Victoria")
         return
 
-    print("Of course Master let me Help you\n")
+    ui.NPC_Talk("Of course Master let me Help you\n", "Victoria")
     new_ring = questionary.select(
             "I want... :",
-            choices=gs.RingsInventory
+            choices=gs.RingsInventory,
         ).ask()
     gs.RingsInventory.remove(new_ring)
 
     slotchoice = questionary.select(
         "In wich slot do you want your ring Master ?",
-        choices= ["Slot 1", "Slot 2"]
+        choices= ["Slot 1", "Slot 2"],
+        style= ui.NPC_STYLES["Victoria"],
     ).ask()
 
     if slotchoice == "Slot 1":
@@ -210,32 +216,34 @@ def _remove_ring_bonus(ring_name):
 
 def talk_to_leaf():
     """La fée Leaf raconte une anecdote au hasard (purement cosmétique)."""
-    print("Fairy Leaf :")
+    ui.NPC_Talk("Fairy Leaf :", "Leaf")
     choice = questionary.select(
         "Hey Grimm, wanna hear some random facts? ♪",
-        choices=["Yes", "No"]    
+        choices=["Yes", "No"],
+        style= ui.NPC_STYLES["Leaf"]
     ).ask()
 
     if choice == "Yes":
-        print("Perfect ♡!")
-        print(LeafRandomFact[randint(0, len(LeafRandomFact) - 1)])
+        ui.NPC_Talk("Perfect ♡!", "Leaf")
+        ui.NPC_Talk(LeafRandomFact[randint(0, len(LeafRandomFact) - 1)], "Leaf")
     elif choice == "No":
-        print("Well to bad for you ~♡")
+        ui.NPC_Talk("Well to bad for you ~♡", "Leaf")
     else:
-        print("Come on, you can’t even hit 1 or 2 properly? Geez, what are we gonna do with you? ♪")
+        ui.NPC_Talk("Come on, you can’t even hit 1 or 2 properly? Geez, what are we gonna do with you? ♪", "Leaf")
 
 
 def talk_to_catherine():
     """Affiche les stats actuelles (Max_Stats) et le nombre de Souls du joueur."""
-    print("Saint Catherine :")
-    print("Welcome back, sir Grimm.\nPlease don't overwork yourself, alright?\nIts fine to rest a little")
+    ui.NPC_Talk("Saint Catherine :", "Catherine")
+    ui.NPC_Talk("Welcome back, sir Grimm.\nPlease don't overwork yourself, alright?\nIts fine to rest a little", "Catherine")
     choice = questionary.select(
         "Shall I examine your stats, if it pleases you?",
-        choices= ["Yes please", "No no need"]
+        choices= ["Yes please", "No no need"],
+        style= ui.NPC_STYLES["Catherine"]
     ).ask()
 
     if choice == "Yes please":
-        print("Very well here you go... :\n")
+        ui.NPC_Talk("Very well here you go... :\n", "Catherine")
         print(gs.Name, " : ")
         print("HP :", gs.Max_Stats[gs.HP])
         print("MP :", gs.Max_Stats[gs.MP])
@@ -246,23 +254,24 @@ def talk_to_catherine():
         print("LCK :", gs.Max_Stats[gs.LCK])
         print("Souls :", gs.Stats[gs.SOULS])
     elif choice == "No no need":
-        print("Radiance of God's beauty surpasses the sun\nand the intellect governs all creation.")
-        print("I pray for your return sir Grimm, may you come back safely")
+        ui.NPC_Talk("Radiance of God's beauty surpasses the sun\nand the intellect governs all creation.", "Catherine")
+        ui.NPC_Talk("I pray for your return sir Grimm, may you come back safely", "Catherine")
     else:
-        print("My, my... You must be utterly exhausted. Please, take all the time you need to rest.")
+        ui.NPC_Talk("My, my... You must be utterly exhausted. Please, take all the time you need to rest.", "Catherine")
 
 
 def talk_to_dorothy():
     """Boutique des sorts, et rappel de ce que fait chaque sort."""
-    print("Witch Dorothy :")
+    ui.NPC_Talk("Witch Dorothy :", "Dorothy")
     choice = questionary.select(
         "Oh? its you apprentice. What's the matter?",
-        choices=["I want to buy spells", "Teach me more about magic", "Just passing by"]
+        choices=["I want to buy spells", "Teach me more about magic", "Just passing by"],
+        style= ui.NPC_STYLES["Dorothy"]
     ).ask()
     
     if choice == "I want to buy spells":
         if len(SpellsListName) != 0:
-            print("Stare all you want")
+            ui.NPC_Talk("Stare all you want", "Dorothy")
             answer = []
             for i in range(len(SpellsListName)):
                 answer.append(
@@ -274,16 +283,17 @@ def talk_to_dorothy():
             answer.append(questionary.Choice(title="Nevermind", value="❌"))
             buychoice = questionary.select(
                 f"So, which incantation catches your eye, hmm? : Souls : {gs.Stats[gs.SOULS]}",
-                choices= answer
+                choices= answer,
+                style= ui.NPC_STYLES["Dorothy"]
             ).ask()
 
             if buychoice == "❌":
-                print("Wandering without purpose again? You’ll end up hexed by your own confusion.")
+                ui.NPC_Talk("Wandering without purpose again? You’ll end up hexed by your own confusion.", "Dorothy")
                 return
             spellindex = SpellsListName.index(buychoice)
 
             if SpellsListCost[spellindex] > gs.Stats[gs.SOULS]:
-                print("Foolish apprentice you don't have enough Souls.\nQuickly gather them then.")
+                ui.NPC_Talk("Foolish apprentice you don't have enough Souls.\nQuickly gather them then.", "Dorothy")
             else:
                 gs.Spells.append(SpellsListName[spellindex])
                 gs.Stats[gs.SOULS] -= SpellsListCost[spellindex]
@@ -291,22 +301,22 @@ def talk_to_dorothy():
                 # pour que les deux listes restent alignées (voir data_spells.py).
                 SpellsListName.pop(spellindex)
                 SpellsListCost.pop(spellindex)
-                print("All yours now. Don’t say I never gave you anything")
+                ui.NPC_Talk("All yours now. Don’t say I never gave you anything", "Dorothy")
         else:
-            print("Looks like my spells have all found a new home. Hope you use them well.")
+            ui.NPC_Talk("Looks like my spells have all found a new home. Hope you use them well.", "Dorothy")
 
     elif choice == "Teach me more about magic":
-        print("Trying to make sense of it all? How cute")
-        print("Fine, I’ll spill the secrets. Don’t blame me if it’s confusing.\n")
+        ui.NPC_Talk("Trying to make sense of it all? How cute", "Dorothy")
+        ui.NPC_Talk("Fine, I’ll spill the secrets. Don’t blame me if it’s confusing.\n", "Dorothy")
         for spell_name in SpellsListName2:
             print(spell_name, " : ", SpellsExplain[spell_name])
 
     elif choice == "Just passing by":
-        print("Wandering without purpose again? You’ll end up hexed by your own confusion.")
+        ui.NPC_Talk("Wandering without purpose again? You’ll end up hexed by your own confusion.", "Dorothy")
 
     else:
-        print("What nonsense are you babbling now?")
-        print("Honestly... Did you hit your head again, apprentice?")
+        ui.NPC_Talk("What nonsense are you babbling now?", "Dorothy")
+        ui.NPC_Talk("Honestly... Did you hit your head again, apprentice?", "Dorothy")
 
 
 def BoneFire():

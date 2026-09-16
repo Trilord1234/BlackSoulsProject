@@ -13,13 +13,6 @@ Ce fichier ne fait QUE 3 choses :
        lancer le combat, aller au feu de camp, recommencer).
     3. Rien d'autre : toute la vraie logique (combat, boutique, loot...)
        vit dans les autres fichiers du projet (voir leurs docstrings).
-
-TODO CONNUS (repris des notes de l'auteur dans la version originale) :
-    - Gérer les boss à plusieurs phases (Drake Helkaiser a 3 formes d'affilée,
-      Cinderella en a 2, mais rien n'enchaîne encore les phases automatiquement).
-    - Le boss secret n'est pas implémenté.
-    - La victoire finale (`END = True`) n'est déclenchée nulle part encore :
-      la boucle principale ci-dessous est donc actuellement sans fin.
 """
 
 import time
@@ -197,6 +190,7 @@ def run_dungeon_loop():
                 gs.Floor += 1
 
         gs.Escape = False
+        gs.BossFight = False
         bonfire.BoneFire()
         ui.clear_screen()
 
